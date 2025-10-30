@@ -1,59 +1,63 @@
-import React from "react";
+const React = require("react");
 
 function QuestionItem({ question, onDelete, onUpdate }) {
   const { id, prompt, answers, correctIndex } = question;
 
   function handleDeleteClick() {
-    fetch(`http://localhost:4000/questions/${id}`, {
-      method: "DELETE",
-    }).then(() => onDelete(id));
+    fetch(`http://localhost:4000/questions/${id}`, { method: "DELETE" })
+      .then(() => onDelete(id));
   }
 
   function handleCorrectAnswerChange(e) {
     const newCorrectIndex = parseInt(e.target.value);
-
-    
     onUpdate({ ...question, correctIndex: newCorrectIndex });
-
 
     fetch(`http://localhost:4000/questions/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correctIndex: newCorrectIndex }),
     })
       .then((r) => r.json())
-      .then((updatedQuestion) => onUpdate(updatedQuestion));
+      .then((updated) => onUpdate(updated));
   }
 
-  return (
-    <li>
-      <h4>Question {id}</h4>
-      <p>{prompt}</p>
-      <ul>
-        {answers.map((answer, index) => (
-          <li
-            key={index}
-            style={{ fontWeight: index === correctIndex ? "bold" : "normal" }}
-          >
-            {answer}
-          </li>
-        ))}
-      </ul>
-      <label>
-        Correct Answer:
-        <select value={correctIndex} onChange={handleCorrectAnswerChange}>
-          {answers.map((answer, index) => (
-            <option key={index} value={index}>
-              {answer}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button onClick={handleDeleteClick}>Delete Question</button>
-    </li>
+  return React.createElement(
+    "li",
+    null,
+    React.createElement("h4", null, `Question ${id}`),
+    React.createElement("p", null, prompt),
+    React.createElement(
+      "ul",
+      null,
+      answers.map((a, i) =>
+        React.createElement(
+          "li",
+          {
+            key: i,
+            style: { fontWeight: i === correctIndex ? "bold" : "normal" },
+          },
+          a
+        )
+      )
+    ),
+    React.createElement(
+      "label",
+      null,
+      "Correct Answer:",
+      React.createElement(
+        "select",
+        { value: correctIndex, onChange: handleCorrectAnswerChange },
+        answers.map((a, i) =>
+          React.createElement("option", { key: i, value: i }, a)
+        )
+      )
+    ),
+    React.createElement(
+      "button",
+      { onClick: handleDeleteClick },
+      "Delete Question"
+    )
   );
 }
 
-export default QuestionItem;
+module.exports = QuestionItem;

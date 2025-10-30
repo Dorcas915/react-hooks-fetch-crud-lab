@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+const React = require("react");
+const { useState } = React;
 
 function QuestionForm({ onAddQuestion }) {
   const [formData, setFormData] = useState({
     prompt: "",
-    answer1: "",
-    answer2: "",
+    answers: ["", ""],
     correctIndex: 0,
   });
 
@@ -12,73 +12,73 @@ function QuestionForm({ onAddQuestion }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
+  function handleAnswerChange(e, index) {
+    const newAnswers = [...formData.answers];
+    newAnswers[index] = e.target.value;
+    setFormData({ ...formData, answers: newAnswers });
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
-
-    const newQuestion = {
-      prompt: formData.prompt,
-      answers: [formData.answer1, formData.answer2],
-      correctIndex: parseInt(formData.correctIndex),
-    };
-
     fetch("http://localhost:4000/questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newQuestion),
+      body: JSON.stringify(formData),
     })
       .then((r) => r.json())
-      .then((data) => onAddQuestion(data));
+      .then((newQuestion) => onAddQuestion(newQuestion));
   }
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>New Question</h2>
-
-      <label>
-        Prompt
-        <input
-          type="text"
-          name="prompt"
-          value={formData.prompt}
-          onChange={handleChange}
-        />
-      </label>
-
-      <label>
-        Answer 1
-        <input
-          type="text"
-          name="answer1"
-          value={formData.answer1}
-          onChange={handleChange}
-        />
-      </label>
-
-      <label>
-        Answer 2
-        <input
-          type="text"
-          name="answer2"
-          value={formData.answer2}
-          onChange={handleChange}
-        />
-      </label>
-
-      <label>
-        Correct Answer
-        <select
-          name="correctIndex"
-          value={formData.correctIndex}
-          onChange={handleChange}
-        >
-          <option value="0">Answer 1</option>
-          <option value="1">Answer 2</option>
-        </select>
-      </label>
-
-      <button type="submit">Add Question</button>
-    </form>
+  return React.createElement(
+    "form",
+    { onSubmit: handleSubmit },
+    React.createElement("h2", null, "New Question Form"),
+    React.createElement(
+      "label",
+      null,
+      "Prompt:",
+      React.createElement("input", {
+        type: "text",
+        name: "prompt",
+        value: formData.prompt,
+        onChange: handleChange,
+      })
+    ),
+    React.createElement(
+      "label",
+      null,
+      "Answer 1:",
+      React.createElement("input", {
+        type: "text",
+        value: formData.answers[0],
+        onChange: (e) => handleAnswerChange(e, 0),
+      })
+    ),
+    React.createElement(
+      "label",
+      null,
+      "Answer 2:",
+      React.createElement("input", {
+        type: "text",
+        value: formData.answers[1],
+        onChange: (e) => handleAnswerChange(e, 1),
+      })
+    ),
+    React.createElement(
+      "label",
+      null,
+      "Correct Answer:",
+      React.createElement("select", {
+        name: "correctIndex",
+        value: formData.correctIndex,
+        onChange: handleChange,
+      },
+        React.createElement("option", { value: 0 }, "Answer 1"),
+        React.createElement("option", { value: 1 }, "Answer 2")
+      )
+    ),
+    React.createElement("button", { type: "submit" }, "Add Question")
   );
 }
 
-export default QuestionForm;
+module.exports = QuestionForm;

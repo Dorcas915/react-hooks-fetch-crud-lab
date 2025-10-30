@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import QuestionList from "./QuestionList";
-import QuestionForm from "./QuestionForm";
+const React = require("react");
+const { useState, useEffect } = React;
+const QuestionList = require("./QuestionList");
+const QuestionForm = require("./QuestionForm");
 
 function App() {
-  const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState("list");
+  const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:4000/questions")
@@ -17,36 +18,44 @@ function App() {
   }
 
   function handleDeleteQuestion(id) {
-    const updated = questions.filter((q) => q.id !== id);
-    setQuestions(updated);
+    setQuestions(questions.filter((q) => q.id !== id));
   }
 
   function handleUpdateQuestion(updatedQuestion) {
-    const updated = questions.map((q) =>
-      q.id === updatedQuestion.id ? updatedQuestion : q
+    setQuestions(
+      questions.map((q) =>
+        q.id === updatedQuestion.id ? updatedQuestion : q
+      )
     );
-    setQuestions(updated);
   }
 
-  return (
-    <div>
-      <h1>Quiz Admin</h1>
-      <nav>
-        <button onClick={() => setPage("list")}>View Questions</button>
-        <button onClick={() => setPage("form")}>New Question</button>
-      </nav>
-
-      {page === "list" ? (
-        <QuestionList
-          questions={questions}
-          onDeleteQuestion={handleDeleteQuestion}
-          onUpdateQuestion={handleUpdateQuestion}
-        />
-      ) : (
-        <QuestionForm onAddQuestion={handleAddQuestion} />
-      )}
-    </div>
+  return React.createElement(
+    "main",
+    null,
+    React.createElement(
+      "nav",
+      null,
+      React.createElement(
+        "button",
+        { onClick: () => setPage("list") },
+        "View Questions"
+      ),
+      React.createElement(
+        "button",
+        { onClick: () => setPage("form") },
+        "New Question"
+      )
+    ),
+    page === "list"
+      ? React.createElement(QuestionList, {
+          questions: questions,
+          onDelete: handleDeleteQuestion,
+          onUpdate: handleUpdateQuestion,
+        })
+      : React.createElement(QuestionForm, {
+          onAddQuestion: handleAddQuestion,
+        })
   );
 }
 
-export default App;
+module.exports = App;

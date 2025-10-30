@@ -1,22 +1,24 @@
-import React from "react";
-import QuestionItem from "./QuestionItem";
+const React = require("react");
+const QuestionItem = require("./QuestionItem");
 
-function QuestionList({ questions, onDeleteQuestion, onUpdateQuestion }) {
-  const questionItems = questions.map((q) => (
-    <QuestionItem
-      key={q.id}
-      question={q}
-      onDelete={onDeleteQuestion}
-      onUpdate={onUpdateQuestion}
-    />
-  ));
-
-  return (
-    <section>
-      <h2>Questions</h2>
-      <ul>{questionItems}</ul>
-    </section>
+function QuestionList({ questions, onDelete, onUpdate }) {
+  return React.createElement(
+    "section",
+    null,
+    React.createElement("h1", null, "Question List"),
+    React.createElement(
+      "ul",
+      null,
+      questions.map((q) =>
+        React.createElement(QuestionItem, {
+          key: q.id,
+          question: q,
+          onDelete: onDelete,
+          onUpdate: onUpdate,
+        })
+      )
+    )
   );
 }
 
-export default QuestionList;
+module.exports = QuestionList;
